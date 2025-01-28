@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buffet Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Left Panel -->
+        <div class="panel left-panel">
+            <div class="panel-title">Select Food</div>
+            <div class="item">
+                <label class="dropdown-title" for="dropdown-tray-1">Buffet 1:</label>
+                <select data-tray="1">
+                    <option>Meat</option>
+                    <option>Fish</option>
+                    <option>Vegetables</option>
+                    <option>Dairy</option>
+                    <option>Cheese</option>
+                    <option>Fruits</option>
+                </select>
+            </div>
+            <div class="item">
+                <label class="dropdown-title" for="dropdown-tray-2">Buffet 2:</label>
+                <select data-tray="2">
+                    <option>Meat</option>
+                    <option>Fish</option>
+                    <option>Vegetables</option>
+                    <option>Dairy</option>
+                    <option>Cheese</option>
+                    <option>Fruits</option>
+                </select>
+            </div>
+            <div class="item">
+                <label class="dropdown-title" for="dropdown-tray-3">Buffet 3:</label>
+                <select data-tray="3">
+                    <option>Meat</option>
+                    <option>Fish</option>
+                    <option>Vegetables</option>
+                    <option>Dairy</option>
+                    <option>Cheese</option>
+                    <option>Fruits</option>
+                </select>
+            </div>
+            <div class="item">
+                <label class="dropdown-title" for="dropdown-tray-4">Buffet 4:</label>
+                <select data-tray="4">
+                    <option>Meat</option>
+                    <option>Fish</option>
+                    <option>Vegetables</option>
+                    <option>Dairy</option>
+                    <option>Cheese</option>
+                    <option>Fruits</option>
+                </select>
+            </div>
+            <div class="item">
+                <label class="dropdown-title" for="dropdown-tray-5">Buffet 5:</label>
+                <select data-tray="5">
+                    <option>Meat</option>
+                    <option>Fish</option>
+                    <option>Vegetables</option>
+                    <option>Dairy</option>
+                    <option>Cheese</option>
+                    <option>Fruits</option>
+                </select>
+            </div>
+            <div class="item">
+                <label class="dropdown-title" for="dropdown-tray-6">Buffet 6:</label>
+                <select data-tray="6">
+                    <option>Meat</option>
+                    <option>Fish</option>
+                    <option>Vegetables</option>
+                    <option>Dairy</option>
+                    <option>Cheese</option>
+                    <option>Fruits</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Center Panel -->
+        <div class="panel center-panel">
+            <div class="panel-title">Metrics</div>
+            <div class="statistics">
+                <div class="stat-container">
+                    <div class="stat-bar" id="stat-bar-1" data-hover=""></div>
+                    <div class="stat-label">Buffet 1</div>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar" id="stat-bar-2" data-hover=""></div>
+                    <div class="stat-label">Buffet 2</div>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar" id="stat-bar-3" data-hover=""></div>
+                    <div class="stat-label">Buffet 3</div>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar" id="stat-bar-4" data-hover=""></div>
+                    <div class="stat-label">Buffet 4</div>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar" id="stat-bar-5" data-hover=""></div>
+                    <div class="stat-label">Buffet 5</div>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar" id="stat-bar-6" data-hover=""></div>
+                    <div class="stat-label">Buffet 6</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="panel right-panel">
+            <div class="panel-title">Graphics</div>
+            <div class="chart-container">
+                <canvas id="dailyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trays at Bottom -->
+    <div class="trays" id="trays">
+        <!-- Trays will be dynamically generated -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
