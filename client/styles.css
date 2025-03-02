@@ -7,7 +7,8 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden; /* Only prevent horizontal overflow */
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 
 .dashboard {
@@ -127,34 +128,64 @@ body {
 .stat-bar {
     width: 100%;
     flex-grow: 1;
-    border-radius: 8px; /* Smooth rounded corners */
-    background: linear-gradient(to top, #4caf50, #81c784); /* Default green gradient */
+    border-radius: 8px;
+    /* Add explicit minimum height */
+    min-height: 40px; /* Ensures mobile visibility */
+    /* Add fallback background */
+    background: #e0e0e0; /* Light gray fallback */
+    /* Update gradient declaration */
+    background: linear-gradient(to top, #4caf50, #81c784) #e0e0e0; /* Fallback first */
     position: relative;
-    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for a modern look */
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Add mobile-specific height */
+@media (max-width: 768px) {
+    .stat-bar {
+        min-height: 60px; /* Larger touch target */
+    }
+}
+
+.stat-bar[style] {
+    background-image: none !important; /* Override any missing gradient */
 }
 
 .stat-bar:hover {
-    transform: translateY(-5px); /* Bar lifts slightly on hover */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+    transform: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+
 .stat-bar:hover::after {
-    content: attr(data-hover); /* Display data from the "data-hover" attribute */
+    content: attr(data-hover);
     position: absolute;
-    bottom: 50%; /* Centers the tooltip vertically */
-    left: 50%; /* Centers the tooltip horizontally */
-    transform: translate(-50%, 50%); /* Adjust positioning */
-    background: rgba(0, 0, 0, 0.8); /* Dark tooltip background */
+    bottom: 100%; /* Position above the bar */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
     color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.85rem;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
     white-space: nowrap;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Tooltip shadow */
-    z-index: 10;
-    opacity: 0; /* Always show on hover */
-    transition: opacity 0.3s ease;
+    z-index: 1000;
+    opacity: 1;
+    pointer-events: none;
+    margin-bottom: 10px; /* Add space between tooltip and bar */
+}
+
+.stat-bar:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+    margin-bottom: 5px;
+    z-index: 1000;
 }
 
 .stat-bar:hover::after {
@@ -256,4 +287,158 @@ canvas {
 .left-panel select {
     flex: 1; /* Ensure the dropdown stretches to take up remaining space */
     max-width: 300px; /* Optional: Limit the dropdown's width */
+}
+
+/* Add these at the bottom of styles.css */
+
+/* Medium screens (tablets) */
+@media (max-width: 1024px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        height: auto;
+    }
+
+    .trays {
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 300px;
+    }
+
+    .statistics {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .stat-container {
+        width: 30%;
+        height: 150px;
+    }
+
+    .left-panel {
+        height: auto;
+        grid-template-rows: repeat(auto-fit, minmax(60px, 1fr));
+    }
+}
+
+/* Small screens (phones) */
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 10px;
+    }
+
+    .trays {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 250px;
+    }
+
+    .statistics {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-container {
+        width: 80%;
+        height: 60px;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .stat-bar {
+        height: 100%;
+        width: 50px;
+    }
+
+    .stat-label {
+        margin-top: 0;
+    }
+
+    .left-panel select {
+        max-width: none;
+    }
+
+    .item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dropdown-title {
+        min-width: auto;
+    }
+
+    .panel-title {
+        position: static;
+        margin-bottom: 10px;
+        background: none;
+        padding: 0;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .trays {
+        grid-template-columns: 1fr;
+        grid-auto-rows: 200px;
+    }
+
+    .stat-container {
+        width: 100%;
+    }
+
+    .left-panel select {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .dropdown-title {
+        font-size: 0.9rem;
+    }
+}
+
+/* Make chart container responsive */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px; /* Fixed height for better mobile display */
+}
+
+@media (min-width: 768px) {
+    .chart-container {
+        height: 400px;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .stat-bar {
+        touch-action: manipulation; /* Improve touch responsiveness */
+    }
+    
+    .stat-bar:hover::after {
+        display: none; /* Disable hover tooltips on touch devices */
+    }
+    
+    .tray:hover {
+        transform: none; /* Disable hover effects */
+    }
+    
+    .left-panel select {
+        font-size: 16px; /* Prevent iOS zoom */
+        padding: 12px; /* Larger touch target */
+    }
+    
+    /* Add touch-friendly tooltip */
+    .stat-container .mobile-tooltip {
+        display: block;
+        position: absolute;
+        bottom: calc(100% + 10px);
+        background: rgba(0, 0, 0, 0);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        z-index: 1000;
+    }
 }

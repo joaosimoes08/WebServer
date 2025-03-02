@@ -6,8 +6,13 @@ const cors = require("cors");
 let dotenv = require('dotenv');
 const multer = require('multer');
 const mongoose = require('mongoose'); // Added for MongoDB integration
+const OpenAI = require('openai');
 
 dotenv.config();
+
+const openai = new OpenAI();
+
+
 
 const mongoURI = process.env.MONGO_URI;
 
@@ -42,9 +47,10 @@ app.use(
 // Middleware to parse JSON data
 app.use(express.json());
 
-//JSON File for SensorData
-const sensorsFile = path.join(__dirname,"data", "sensorsData.json");
-
+app.use(express.static(path.join(__dirname, "../client")));
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client", "index.html"));
+});
 
 //Start Data Array
 let Data = [];
@@ -78,7 +84,7 @@ const initializeData = async () => {
             
             // Update local Data array with MongoDB data
             Data = existingData.map(item => ({
-                tray_name: item.name,
+                tray_name: item.tray_name,
                 ppm: item.ppm,
                 temp: item.temp,
                 tvoc: item.tvoc,
@@ -102,6 +108,51 @@ function encodeImageToBase64(imagePath) {
     return fs.readFileSync(imagePath, { encoding: "base64" });
 }
 
+async function GPT_Veredict(tray_food, ppm, tvoc, temp, base64Image) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "assistant",
+          content: `
+The raw ${tray_food} in a buffet has the following values:
+- CO2: ${ppm} ppm
+- VOC: ${tvoc} ppb
+- Temperature: ${temp}°C.
+
+Based solely on these specific values and the accompanying image, respond only with "Yes" if the food is safe for consumption or "No" if it is not.
+          `,
+        },
+        {
+          role: "assistant",
+          content: "",
+          type: "image_url",
+          image_url: `data:image/jpeg;base64,${base64Image}`,
+        },
+      ],
+    });
+    
+    console.log("Resposta completa da API:", JSON.stringify(response, null, 2));
+
+    if (response && response.data && Array.isArray(response.data.choices) && response.data.choices.length > 0 && response.data.choices[0].message) {
+      const verdict = response.data.choices[0].message.content.trim();
+      console.log("GPT verdict:", verdict);
+      return verdict;
+    } else {
+      console.error("Estrutura da resposta inesperada:", response);
+      return null;
+    }
+  } catch (err) {
+    console.error("Erro na função GPT_Veredict:", err);
+    throw err;
+  }
+}
+
+
+
+
+
 //////////////////////
 
 // API FOR IMAGES
@@ -116,8 +167,6 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
     let { tray_number } = req.body;
     tray_number = Number(tray_number);
 
-    console.log(tray_number);
-
     // Validate tray_number
     if (typeof tray_number !== "number" || tray_number <= 0) {
         return res.status(400).json({ error: "Invalid tray_number. It must be a positive number." });
@@ -131,7 +180,6 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
         // Convert the uploaded file (buffer) to Base64
         const base64Image = req.file.buffer.toString("base64");
 
-        console.log(base64Image);
         // Get tray data from MongoDB
         const tray = await DataModel.findOne({ tray_number });
         if (!tray) {
@@ -139,7 +187,7 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
         }
 
         // Mock AI Verdict - Replace with actual function
-        const answer = "Olá"; // Replace with: await GPT_Veredict(tray.tray_food, tray.ppm, tray.tvoc, tray.temp, base64Image);
+        const answer = await GPT_Veredict(tray.tray_food, tray.ppm, tray.tvoc, tray.temp, base64Image);
 
         if (!answer) {
             return res.status(500).json({ error: "Failed to get an answer from the AI model." });

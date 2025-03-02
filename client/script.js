@@ -101,6 +101,56 @@ let data = [
     { ppm: 14040, temp: 10, tray_number: 6 }, // Tray 6
 ];
 
+function addTouchSupport() {
+    // Add touch support for stat bars
+    document.querySelectorAll('.stat-bar').forEach((bar, index) => {
+        let tooltip = document.createElement('div');
+        tooltip.className = 'mobile-tooltip';
+        bar.parentElement.appendChild(tooltip);
+
+        // Touch events
+        bar.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const entry = data[index];
+            const thresholds = foodThresholds[trays[index].food_type] || {};
+            
+            tooltip.innerHTML = `
+                CO2: <span style="color: ${entry.ppm > thresholds.ppmMax ? 'red' : 'white'}">${entry.ppm}ppm</span><br>
+                Temp: <span style="color: ${entry.temp > thresholds.tempMax ? 'red' : 'white'}">${entry.temp}°C</span><br>
+                TVOC: <span style="color: ${entry.tvoc > thresholds.TVOCMax ? 'red' : 'white'}">${entry.tvoc}ppb</span>
+            `;
+            tooltip.style.display = 'block';
+            tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+        });
+
+        bar.addEventListener('touchend', () => {
+            tooltip.style.display = 'none';
+        });
+    });
+
+    // Add touch support for dropdowns
+    document.querySelectorAll('select').forEach(select => {
+        select.addEventListener('touchstart', (e) => {
+            e.stopPropagation(); // Prevent scrolling when interacting
+        });
+    });
+
+    // Add touch support for trays
+    document.querySelectorAll('.tray').forEach(tray => {
+        tray.style.cursor = 'pointer'; // Show visual feedback
+        tray.addEventListener('touchstart', () => {
+            tray.style.transform = 'scale(0.98)'; // Visual feedback
+        });
+        
+        tray.addEventListener('touchend', () => {
+            tray.style.transform = 'scale(1)';
+        });
+    });
+}
+
+// Initialize touch support
+addTouchSupport();
+
 async function fetchSensorDataAndUpdate() {
     try {
         const response = await fetch("/api/sensors");
@@ -114,6 +164,8 @@ async function fetchSensorDataAndUpdate() {
         data.forEach((entry, index) => {
             const bar = document.getElementById(`stat-bar-${index + 1}`);
             const tray = trayContainer.children[index];
+
+            bar.style.background = "#e0e0e0";
     
             // Determine color based on thresholds
             const values = { ppm: entry.ppm, temperature: entry.temp, TVOC: entry.tvoc };
@@ -125,7 +177,7 @@ async function fetchSensorDataAndUpdate() {
             }
             const rgbColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
             bar.style.background = rgbColor;
-    
+            
             // Set tray outline color
             tray.style.borderColor = rgbColor;
             tray.style.boxShadow = `0 0 3px ${rgbColor}`; // Add a subtle glowing effect
@@ -168,6 +220,9 @@ async function fetchSensorDataAndUpdate() {
             bar.addEventListener("mouseout", () => {
                 const tooltip = document.getElementById(`tooltip-${index}`);
                 if (tooltip) tooltip.remove();
+            });
+            document.querySelectorAll('.stat-bar').forEach((bar, index) => {
+                bar.style.cursor = 'pointer'; // Visual feedback for touch
             });
         });
     } catch (error) {
